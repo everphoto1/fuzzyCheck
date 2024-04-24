@@ -20,16 +20,17 @@ const glados = async () => {
       method: 'GET',
       headers,
     }).then((r) => r.json())
-    
+
+     if (status.code) {
+      throw new Error(`API request failed with status: ${status.message}`);
+    }
     return [
       'Checkin OK',
       `${checkin.message}`,
       `Left Days ${Number(status.data.leftDays)}`,
     ]
   } catch (error) {
-    console.log('Checkin Error:', error)
-    console.log('Checkin Response:', checkin)
-    console.log('Status Response:', status)
+  
     return [
       'Checkin Error',
       `${error}`,
