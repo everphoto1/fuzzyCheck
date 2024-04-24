@@ -11,11 +11,15 @@ const glados = async () => {
       method: 'POST',
       headers: { ...headers, 'content-type': 'application/json' },
       body: '{"token":"glados.one"}',
-    }).then((r) => r.json())
+    }).then((r) => r.json()).error(e){
+      console.log(checkin, e)
+    }
     const status = await fetch('https://glados.rocks/api/user/status', {
       method: 'GET',
       headers,
-    }).then((r) => r.json())
+    }).then((r) => r.json()).error(e){
+      console.log(checkin, e)
+    }
     
     return [
       'Checkin OK',
@@ -27,8 +31,6 @@ const glados = async () => {
       'Checkin Error',
       `${error}`,
       `<${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}>`,
-      `${checkin}`,
-      `${status}`,
     ]
   }
 }
