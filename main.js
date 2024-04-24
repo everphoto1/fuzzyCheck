@@ -16,6 +16,7 @@ const glados = async () => {
       method: 'GET',
       headers,
     }).then((r) => r.json())
+    
     return [
       'Checkin OK',
       `${checkin.message}`,
@@ -26,6 +27,8 @@ const glados = async () => {
       'Checkin Error',
       `${error}`,
       `<${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}>`,
+      `${checkin}`,
+      `${status}`,
     ]
   }
 }
