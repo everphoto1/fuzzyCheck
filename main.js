@@ -11,15 +11,15 @@ const glados = async () => {
       method: 'POST',
       headers: { ...headers, 'content-type': 'application/json' },
       body: '{"token":"glados.one"}',
-    }).then((r) => r.json()).error(e){
-      console.log(checkin, e)
+    }).then((r) => r.json())
+
+    if (checkin.code) {
+      throw new Error(`API request failed with status: ${checkin.message}`);
     }
     const status = await fetch('https://glados.rocks/api/user/status', {
       method: 'GET',
       headers,
-    }).then((r) => r.json()).error(e){
-      console.log(checkin, e)
-    }
+    }).then((r) => r.json())
     
     return [
       'Checkin OK',
@@ -27,6 +27,9 @@ const glados = async () => {
       `Left Days ${Number(status.data.leftDays)}`,
     ]
   } catch (error) {
+    console.log('Checkin Error:', error)
+    console.log('Checkin Response:', checkin)
+    console.log('Status Response:', status)
     return [
       'Checkin Error',
       `${error}`,
