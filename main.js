@@ -1,6 +1,6 @@
 const glados = async () => {
   const cookie = process.env.GLADOS
-  if (!cookie) return ['Checkin Skip', 'Missing GLADOS cookie']
+  if (!cookie) throw new Error('Missing GLADOS cookie')
 
   const baseURL = 'https://glados.rocks'
 
@@ -43,16 +43,18 @@ const glados = async () => {
       `Left Days ${Number(status.data.leftDays).toFixed(2)}`,
     ]
   } catch (error) {
-    return [
-      'Checkin Error',
-      `${error}`,
-      `<${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}>`,
-    ]
+    // 抛出异常，交由外层处理使 workflow 失败并触发通知
+    throw new Error(`Checkin Error: ${error?.message ?? error}`)
   }
 }
 
 const main = async () => {
-  console.log(await glados())
+  const result = await glados()
+  console.log(result)
 }
 
-main()
+// 未捕获的错误会在这里被捕获并以非 0 退出，从而让 GitHub Actions 标记为失败并触发通知
+main().catch((err) => {
+  console.error(err)
+  process.exit(1)
+})
