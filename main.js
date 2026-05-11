@@ -1,33 +1,46 @@
 const glados = async () => {
   const cookie = process.env.GLADOS
-  if (!cookie) return
+  if (!cookie) return ['Checkin Skip', 'Missing GLADOS cookie']
+
+  const baseURL = 'https://glados.rocks'
+
   try {
     const headers = {
-      'cookie': cookie,
-      'referer': 'https://glados.cloud/console/checkin',
-      'user-agent': 'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0)',
+      accept: 'application/json, text/plain, */*',
+      'accept-language': 'en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7',
+      cookie,
+      origin: baseURL,
+      referer: `${baseURL}/console/checkin`,
+      'user-agent':
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36',
     }
-    const checkin = await fetch('https://glados.cloud/api/user/checkin', {
+
+    const checkin = await fetch(`${baseURL}/api/user/checkin`, {
       method: 'POST',
-      headers: { ...headers, 'content-type': 'application/json;charset=UTF-8' },
-      body: JSON.stringify({ token: 'glados.cloud' }),
+      headers: {
+        ...headers,
+        'content-type': 'application/json;charset=UTF-8',
+      },
+      body: JSON.stringify({ token: 'glados.rocks' }),
     }).then((r) => r.json())
 
     if (checkin.code) {
-      throw new Error(`API request failed with status: ${checkin.message}`);
+      throw new Error(`Checkin failed: ${checkin.message}`)
     }
-    const status = await fetch('https://glados.cloud/api/user/status', {
+
+    const status = await fetch(`${baseURL}/api/user/status`, {
       method: 'GET',
       headers,
     }).then((r) => r.json())
 
     if (status.code) {
-      throw new Error(`API request failed with status: ${status.message}`);
+      throw new Error(`Status failed: ${status.message}`)
     }
+
     return [
       'Checkin OK',
       `${checkin.message}`,
-      `Left Days ${Number(status.data.leftDays)}`,
+      `Left Days ${Number(status.data.leftDays).toFixed(2)}`,
     ]
   } catch (error) {
     return [
@@ -39,7 +52,7 @@ const glados = async () => {
 }
 
 const main = async () => {
-  console.log(await glados());
+  console.log(await glados())
 }
 
 main()
